@@ -7,6 +7,7 @@ const recentIntents = [];
 const smartStarts = [];
 const availabilityCache = new Map();
 const DEFAULT_ACTION_TITLE = "Download Folder Recall";
+let activeDialogAssist = null;
 
 async function savePending(id, task) {
   pending.set(id, task);
@@ -124,6 +125,81 @@ async function startSmartDownload(url, contextUrl) {
   }
 }
 
+function isSupportedAssistPage(value) {
+  try {
+    const host = new URL(value).hostname.toLowerCase();
+    return host === "github.com" || host === "www.github.com" || host === "nexusmods.com" || host.endsWith(".nexusmods.com");
+  } catch {
+    return false;
+  }
+}
+
+async function armSaveAsDialogAssist(mapping) {
+  if (activeDialogAssist) return { ok: false, error: "Another Save As assist is already waiting." };
+
+  let port;
+  try {
+    port = browser.runtime.connectNative(HOST_NAME);
+  } catch (error) {
+    return { ok: false, error: `Native helper unavailable: ${error.message}. Run native/install.ps1 first.` };
+  }
+
+  return new Promise((resolve) => {
+    let acknowledged = false;
+    let settled = false;
+    const finishAck = (value) => {
+      if (settled) return;
+      settled = true;
+      resolve(value);
+    };
+    const clearActive = () => {
+      if (activeDialogAssist?.port === port) activeDialogAssist = null;
+    };
+    const timeout = setTimeout(() => {
+      finishAck({ ok: false, error: "The native helper did not arm the dialog watcher in time." });
+      clearActive();
+      try { port.disconnect(); } catch {}
+    }, 3000);
+
+    activeDialogAssist = { port, mapping };
+    port.onMessage.addListener((response) => {
+      if (response.armed) {
+        acknowledged = true;
+        clearTimeout(timeout);
+        finishAck({ ok: true });
+        return;
+      }
+      if (response.completed) {
+        clearTimeout(timeout);
+        clearActive();
+        if (response.ok) setStatus("ok", `Save As opened in ${response.path || mapping.folder}`).catch(() => {});
+        else setStatus("error", response.error || "Save As assistance failed.").catch(() => {});
+        try { port.disconnect(); } catch {}
+        return;
+      }
+      if (!response.ok) {
+        clearTimeout(timeout);
+        clearActive();
+        finishAck({ ok: false, error: response.error || "The helper could not arm Save As assistance." });
+        try { port.disconnect(); } catch {}
+      }
+    });
+    port.onDisconnect.addListener(() => {
+      clearTimeout(timeout);
+      clearActive();
+      if (!acknowledged) {
+        const error = browser.runtime.lastError?.message || "Native helper disconnected before it was armed.";
+        finishAck({ ok: false, error });
+      }
+    });
+    port.postMessage({
+      command: "assist_save_dialog",
+      destination_directory: mapping.folder,
+      timeout_ms: 10000
+    });
+  });
+}
+
 browser.downloads.onCreated.addListener(async (item) => {
   if (pending.has(item.id)) return;
   const now = Date.now();
@@ -199,9 +275,23 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     return {
       pageUrl: message.pageUrl,
       mapping,
-      canIntercept: Boolean(state.settings.interceptLeftClicks && mapping && availability.ready),
+      canAssistSaveAs: Boolean(state.settings.saveAsDialogAssist && mapping && availability.ready),
+      canIntercept: Boolean(!state.settings.saveAsDialogAssist && state.settings.interceptLeftClicks && mapping && availability.ready),
       availability
     };
+  }
+  if (message?.type === "arm-save-as-assist") {
+    const state = await getState();
+    const pageUrl = sender.tab?.url || "";
+    if (!state.settings.saveAsDialogAssist || !isSupportedAssistPage(pageUrl) || pageUrl !== message.contextUrl) {
+      return { ok: false, error: "Save As assistance is disabled or the page is not eligible." };
+    }
+    const mapping = resolveMapping([pageUrl, message.url], state.mappings, state.disabledHosts);
+    const availability = mapping ? await mappingAvailability(mapping, false) : { ready: false, reason: "No mapping." };
+    if (!mapping || !availability.ready) return { ok: false, error: availability.reason || "No usable mapping." };
+    const result = await armSaveAsDialogAssist(mapping);
+    if (!result.ok) await setStatus("error", result.error);
+    return result;
   }
   if (message?.type === "smart-download") {
     const state = await getState();

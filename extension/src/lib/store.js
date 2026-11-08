@@ -4,6 +4,7 @@ export const DEFAULT_STATE = {
   settings: {
     automaticLearning: true,
     interceptLeftClicks: false,
+    saveAsDialogAssist: false,
     automaticScope: "host",
     pathDepth: 2,
     collisionAction: "uniquify"
