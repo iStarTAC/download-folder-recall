@@ -1,0 +1,6 @@
+/native/target/
+/release/
+*.xpi
+*.zip
+.DS_Store
+Thumbs.db

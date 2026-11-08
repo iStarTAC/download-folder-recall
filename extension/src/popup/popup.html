@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="stylesheet" href="popup.css"><title>Download Folder Recall</title></head>
+<body>
+  <main>
+    <h1>Download Folder Recall</h1>
+    <div id="identity" class="muted">Detecting this page…</div>
+    <label>Remembered folder</label>
+    <div class="row"><input id="folder" placeholder="No folder remembered"><button id="browse">Browse…</button></div>
+    <div class="row actions"><button id="save" class="primary">Save for this page</button><button id="options">Manage rules</button></div>
+    <p id="status" role="status"></p>
+    <p class="hint">Right-click a link for an explicit mapped download. Recognized left-click downloads can also be enabled under Manage rules.</p>
+    <p class="hint"><a href="https://github.com/iStarTAC/download-folder-recall/releases/latest" target="_blank" rel="noreferrer">Download or update the Windows helper</a></p>
+  </main>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

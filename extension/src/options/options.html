@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="stylesheet" href="options.css"><title>Download Folder Recall settings</title></head>
+<body><main>
+  <h1>Download Folder Recall</h1>
+  <section><h2>Behavior</h2>
+    <label><input id="learning" type="checkbox"> Learn folders from completed normal downloads</label>
+    <label><input id="intercept" type="checkbox"> Use remembered folders when left-clicking recognized direct download links</label>
+    <p class="hint">Supported direct links are intercepted only when the native helper and mapped directory are available. Hold Shift, Ctrl, Alt, or the Windows key while clicking to use normal Firefox behavior.</p>
+    <label>Other-site automatic matching <select id="scope"><option value="host">Hostname</option><option value="path">URL path prefix</option><option value="exact">Exact URL</option></select></label>
+    <label>Path segments <input id="depth" type="number" min="1" max="10"></label>
+    <button id="save-settings">Save behavior</button>
+  </section>
+  <section><h2>Mappings</h2><div id="mappings"></div>
+    <h3>Add rule</h3><div class="grid">
+      <select id="type"><option value="exact">Exact URL</option><option value="github">GitHub owner/repository</option><option value="nexus">Nexus Mods game</option><option value="prefix">URL prefix</option><option value="wildcard">Wildcard</option><option value="host">Hostname</option></select>
+      <input id="pattern" placeholder="Pattern"><input id="folder" placeholder="D:\Downloads\Project"><button id="add">Add</button>
+    </div>
+  </section>
+  <section><h2>Disabled websites</h2><div class="row"><input id="disabled" placeholder="example.com, another.example"><button id="save-disabled">Save</button></div></section>
+  <section><h2>Backup</h2><div class="row"><button id="export">Export JSON</button><label class="file">Import JSON<input id="import" type="file" accept="application/json"></label><button id="reset" class="danger">Reset all data</button></div></section>
+  <p id="status" role="status"></p>
+</main><script type="module" src="options.js"></script></body></html>

@@ -1,0 +1,14 @@
+:root { color-scheme: light dark; font: 13px system-ui, sans-serif; }
+body { margin: 0; min-width: 390px; }
+main { padding: 16px; }
+h1 { font-size: 17px; margin: 0 0 8px; }
+label { display: block; font-weight: 600; margin: 14px 0 5px; }
+.row { display: flex; gap: 7px; }
+input { flex: 1; min-width: 0; padding: 7px; }
+button { padding: 7px 10px; cursor: pointer; }
+.actions { margin-top: 10px; }
+.primary { background: #0060df; color: white; border: 1px solid #0060df; border-radius: 3px; }
+.muted, .hint { color: #737373; overflow-wrap: anywhere; }
+.hint { font-size: 11px; line-height: 1.4; }
+#status { min-height: 1.2em; margin-bottom: 0; }
+.error { color: #d70022; }
