@@ -10,6 +10,7 @@ async function refresh() {
   state = await getState();
   document.querySelector("#learning").checked = state.settings.automaticLearning;
   document.querySelector("#intercept").checked = state.settings.interceptLeftClicks;
+  document.querySelector("#dialog-assist").checked = state.settings.saveAsDialogAssist;
   document.querySelector("#scope").value = state.settings.automaticScope;
   document.querySelector("#depth").value = state.settings.pathDepth;
   document.querySelector("#disabled").value = state.disabledHosts.join(", ");
@@ -27,7 +28,7 @@ async function refresh() {
 }
 
 document.querySelector("#save-settings").addEventListener("click", async () => {
-  state.settings = { ...state.settings, automaticLearning: document.querySelector("#learning").checked, interceptLeftClicks: document.querySelector("#intercept").checked, automaticScope: document.querySelector("#scope").value, pathDepth: Number(document.querySelector("#depth").value) || 2 };
+  state.settings = { ...state.settings, automaticLearning: document.querySelector("#learning").checked, interceptLeftClicks: document.querySelector("#intercept").checked, saveAsDialogAssist: document.querySelector("#dialog-assist").checked, automaticScope: document.querySelector("#scope").value, pathDepth: Number(document.querySelector("#depth").value) || 2 };
   await browser.storage.local.set({ settings: state.settings }); message("Behavior saved.");
 });
 document.querySelector("#save-disabled").addEventListener("click", async () => {

@@ -6,6 +6,8 @@
     <label><input id="learning" type="checkbox"> Learn folders from completed normal downloads</label>
     <label><input id="intercept" type="checkbox"> Use remembered folders when left-clicking recognized direct download links</label>
     <p class="hint">Supported direct links are intercepted only when the native helper and mapped directory are available. Hold Shift, Ctrl, Alt, or the Windows key while clicking to use normal Firefox behavior.</p>
+    <label><input id="dialog-assist" type="checkbox"> Experimental: open Firefox Save As in the remembered folder</label>
+    <p class="hint">Windows only. For a recognized GitHub or Nexus Mods download, the helper waits for one new Firefox Save As dialog and changes only its folder. It never clicks Save. This requires Firefox’s “Always ask you where to save files” setting and takes priority over left-click interception.</p>
     <label>Other-site automatic matching <select id="scope"><option value="host">Hostname</option><option value="path">URL path prefix</option><option value="exact">Exact URL</option></select></label>
     <label>Path segments <input id="depth" type="number" min="1" max="10"></label>
     <button id="save-settings">Save behavior</button>

@@ -1,6 +1,8 @@
 # Download Folder Recall Windows helper
 
-The helper is a short-lived native-messaging application used for the Windows folder picker, directory availability checks, and explicit user-authorized file moves. It is not a service and does not remain running.
+The helper is a short-lived native-messaging application used for the Windows folder picker, directory availability checks, explicit user-authorized file moves, and the opt-in experimental Save As folder assist. It is not a service and does not remain running.
+
+The Save As assist is deliberately limited: it snapshots existing windows, waits briefly for exactly one new visible common file dialog owned by `firefox.exe`, focuses and verifies the dialog's upper address edit, and navigates that edit to the mapped directory. It never invokes Save, Cancel, or a filename control. Any ambiguity or failed verification aborts the attempt.
 
 ## Install a release build
 

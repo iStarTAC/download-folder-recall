@@ -4,7 +4,7 @@ A Windows-focused Firefox extension that recalls download directories using exac
 
 ![Download Folder Recall icon](extension/icons/icon-128.png)
 
-Firefox does **not** expose a supported way for an extension to choose the initial absolute directory of its native Save As dialog. See [the feasibility assessment](docs/feasibility.md) for the researched API boundary and design rationale.
+Firefox does **not** expose a supported way for an extension to choose the initial absolute directory of its native Save As dialog. See [the feasibility assessment](docs/feasibility.md) for the researched API boundary and design rationale. The experimental branch includes an opt-in Windows dialog assist as a deliberately narrow workaround.
 
 ## What works
 
@@ -15,6 +15,7 @@ Firefox does **not** expose a supported way for an extension to choose the initi
 - The toolbar popup shows the current page's identity and mapping. A native folder picker can create or update the mapping.
 - Right-clicking a link and choosing **Download link to remembered folder** performs one Firefox download and then moves it to the mapped absolute directory.
 - An optional setting intercepts ordinary left-clicks on recognized direct GitHub release and Nexus archive links. Modifier-key clicks retain normal Firefox behavior.
+- An experimental Windows-only setting can instead arm the helper for one recognized click, wait for one new Firefox Save As dialog, and change only its address-bar folder. It never presses Save or changes the filename.
 - The toolbar badge shows `✓` when the current page has a usable remembered folder and `!` when its helper or directory needs attention.
 - Exact, site identity (GitHub repository or Nexus Mods game), prefix/wildcard, and hostname rules resolve in that order.
 - Rules can be added/deleted, sites disabled, learning disabled, and state imported/exported as JSON.
@@ -62,6 +63,15 @@ Temporary add-ons are removed when Firefox exits. For permanent installation, th
 3. On a future page in the same repository/rule, right-click a download link and choose **Download link to remembered folder**.
 4. Open **Manage rules** from the popup for custom rules, disabled sites, backup, and reset.
 
+### Experimental Save As assistance
+
+1. In Firefox settings, enable **Always ask you where to save files**.
+2. In **Manage rules**, enable **Experimental: open Firefox Save As in the remembered folder**.
+3. Left-click a recognized direct GitHub release or Nexus Mods archive link.
+4. Confirm that the Save As dialog opened in the remembered directory, then choose whether to save or cancel normally.
+
+The assist is one-shot and opt-in. Before replaying the click, the helper snapshots existing dialogs. It then accepts only one new visible `firefox.exe` common file dialog, focuses the upper address edit, verifies that focus did not land in the filename field, enters the mapped directory, and sends Enter to navigate the address field. It never invokes the dialog’s Save or Cancel button. It aborts on timeout, an ambiguous dialog, a missing directory, or a failed focus check. Modifier-key clicks bypass it.
+
 The context-menu command does not show Save As: it is the explicit alternative used because Firefox cannot seed Save As with the remembered absolute folder. Ordinary clicks still show Save As unless the opt-in left-click interception setting recognizes a direct download link.
 
 ## Development and tests
@@ -105,7 +115,11 @@ These scenarios require manual Firefox testing because they depend on browser UI
 7. Create a duplicate destination and confirm `(1)` uniquification.
 8. Disable automatic learning or the entire extension and confirm normal Firefox behavior.
 
-The project cannot automatically validate Firefox's native dialog behavior from unit tests, and it intentionally contains no UI automation or dialog hooks.
+9. Enable experimental Save As assistance and confirm that only the folder changes; the filename remains intact and Save is never activated automatically.
+10. Open another Firefox dialog before clicking and confirm that an ambiguous or pre-existing dialog is not controlled.
+11. Confirm that a modifier-key click and an unrecognized link retain normal Firefox behavior.
+
+The project cannot automatically validate Firefox's native dialog behavior from unit tests. Experimental Save As assistance therefore requires these manual checks on each supported Windows/Firefox combination.
 
 ## Known limitations
 
@@ -113,4 +127,5 @@ The project cannot automatically validate Firefox's native dialog behavior from 
 - Opaque `objects.githubusercontent.com` URLs need GitHub page/referrer context or a custom rule; the repository cannot be recovered reliably from the opaque URL alone.
 - Referrers may be empty. A download initiated outside a recognizable repository context falls back conservatively instead of guessing.
 - Firefox's download history contains the staging path after a smart move; the native helper cannot rewrite Firefox's download record to the final path.
+- Experimental Save As assistance depends on Windows common-dialog structure and keyboard focus behavior. Firefox or Windows UI changes can break it, so it is disabled by default and must fail closed.
 - Export itself is a normal browser download and may be observed by automatic learning; disable learning temporarily if that is undesirable.
