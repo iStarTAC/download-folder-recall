@@ -4,7 +4,7 @@ A Windows-focused Firefox extension that recalls download directories using exac
 
 ![Download Folder Recall icon](extension/icons/icon-128.png)
 
-Firefox does **not** expose a supported way for an extension to choose the initial absolute directory of its native Save As dialog. See [the feasibility assessment](docs/feasibility.md) for the researched API boundary and design rationale. The experimental branch includes an opt-in Windows dialog assist as a deliberately narrow workaround.
+Firefox does **not** expose a supported way for an extension to choose the initial absolute directory of its native Save As dialog. See [the feasibility assessment](docs/feasibility.md) for the researched API boundary and design rationale. Version 0.3 adds an opt-in Windows dialog assist as a deliberately narrow workaround.
 
 ## What works
 
