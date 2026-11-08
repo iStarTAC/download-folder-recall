@@ -9,4 +9,6 @@
 
 Download and extract `download-folder-recall-helper-windows-x64-0.2.0.zip`, then run `install.ps1 -SkipBuild` from PowerShell. The helper is currently unsigned, so Windows may show a publisher warning.
 
-The Firefox extension must be signed by Mozilla before regular Firefox can install it. The signed XPI will be attached separately after Mozilla signing.
+### Firefox extension
+
+Download `download-folder-recall-0.2.0.xpi` and open it in Firefox. This XPI is signed by Mozilla and remains installed across browser restarts. The Windows helper is installed separately.
